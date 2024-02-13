@@ -4,16 +4,19 @@ FROM python:3.9
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Install Matplotlib, Python development headers, and system packages for LaTeX
+# Install Matplotlib, Python development headers, system packages for LaTeX, Ghostscript, CM-Super, and dvipng
 RUN pip install matplotlib \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        # LaTeX packages required for Matplotlib LaTeX rendering
         texlive-latex-base \
         texlive-fonts-recommended \
-        #texlive-fonts-extra \
-        #texlive-latex-extra \
-    && rm -rf /var/lib/apt/lists/*
+        texlive-fonts-extra \
+        texlive-latex-extra \
+        ghostscript \
+        cm-super \  
+        dvipng \  
+    && rm -rf /var/lib/apt/lists/* \
+    && fc-cache -fv  
 
 # Install Rust compiler and cargo
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
