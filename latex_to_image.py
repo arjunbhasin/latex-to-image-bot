@@ -9,19 +9,23 @@ def latex_to_image(latex_string, filename):
         filename (str): The name of the output image file.
     """
 
-    fig, ax = plt.subplots()
+    # Estimate figure size based on LaTeX string length (basic heuristic)
+    fig_width = max(6, len(latex_string) * 0.2)
+    fig_height = max(2, len(latex_string) * 0.05)
+
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
     # Center the text both horizontally and vertically
-    ax.text(0.5, 0.5, latex_string, ha="center", va="center", fontsize=20)
+    ax.text(0.5, 0.5, f"${latex_string}$", ha="center", va="center", fontsize=20, wrap=True)
 
     # Remove unnecessary axes
     ax.axis("off")
 
     # Adjust layout for tight margins
-    fig.tight_layout()
+    fig.tight_layout(pad=0.1)
 
     # Save the image with specified filename
-    fig.savefig(filename, dpi=600)
+    fig.savefig(filename, dpi=600, bbox_inches='tight')
 
     plt.close()
 

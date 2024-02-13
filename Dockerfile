@@ -9,8 +9,8 @@ RUN pip install matplotlib \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         # LaTeX packages required for Matplotlib LaTeX rendering
-        #texlive-latex-base \
-        #texlive-fonts-recommended \
+        texlive-latex-base \
+        texlive-fonts-recommended \
         #texlive-fonts-extra \
         #texlive-latex-extra \
     && rm -rf /var/lib/apt/lists/*

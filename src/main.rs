@@ -8,11 +8,21 @@ async fn main() {
     let bot = Bot::from_env();
 
     teloxide::repl(bot, |bot:Bot, msg: Message| async move {
-        // Read the incoming message and take the first 25 characters
-        let latex_expr: String = msg.text().unwrap_or_default().chars().take(25).collect();
+        // check if the incoming message is a text message of length < 100 characters
+        if msg.text().unwrap_or_default().len() > 100 {
+            bot.send_message(msg.chat.id, "Expression must be less than 100 characters.")
+                .await
+                .log_on_error()
+                .await;
+            return respond(());
+        }
+
+        // Read the incoming message and take the first 100 characters
+        let latex_expr: String = msg.text().unwrap_or_default().chars().take(100).collect();
 
         // Define the output image file name
-        let output_image = "latex_output.png";
+        // The file name is based on the chat ID and the string "latex_output.png"
+        let output_image: &str = &format!("{}_latex_output.png", msg.chat.id);
 
         // Execute the Python script with `latex_expr` as an argument
         let status = Command::new("python")
@@ -46,7 +56,7 @@ async fn main() {
             }
         }
 
-        // Optionally, delete the image file after sending it
+        // Delete the image file after sending it
         std::fs::remove_file(output_image).ok();
 
         respond(())
