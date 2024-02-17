@@ -1,4 +1,5 @@
 use teloxide::prelude::*;
+use teloxide::adaptors::{Throttle, throttle::Limits};
 use std::process::Command;
 use std::path::Path;
 use teloxide::types::InputFile;
@@ -6,8 +7,17 @@ use teloxide::types::InputFile;
 #[tokio::main]
 async fn main() {
     let bot = Bot::from_env();
+    // Throttle the bot to prevent spamming
+    let bot: Throttle<Bot> = bot.throttle(
+        Limits { 
+            messages_per_sec_chat: 1,
+            messages_per_min_chat: 10, 
+            messages_per_min_channel: 10,
+            messages_per_sec_overall: 1,
+        });
 
-    teloxide::repl(bot, |bot:Bot, msg: Message| async move {
+    teloxide::repl(bot, |bot: Throttle<Bot>, msg: Message| async move {
+
         // check if the incoming message is a text message of length < 100 characters
         if msg.text().unwrap_or_default().len() > 100 {
             bot.send_message(msg.chat.id, "Expression must be less than 100 characters.")
