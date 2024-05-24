@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 teloxide = { version = "0.12", features = ["macros", "throttle"] }
 tokio = { version =  "1.8", features = ["rt-multi-thread", "macros"] }
+reqwest = { version = "0.11", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1.0"
