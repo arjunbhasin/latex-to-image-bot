@@ -8,6 +8,7 @@ use teloxide::prelude::*;
 use teloxide::adaptors::{Throttle, throttle::Limits};
 
 use teloxide::utils::command::BotCommands;
+use teloxide::types::BotCommand;
 
 use bot_commands::{Command, handle_command};
 use latex::convert_expression_to_image;
@@ -21,6 +22,11 @@ async fn message_handler(bot: Throttle<Bot>, msg: Message) -> ResponseResult<()>
             handle_command(bot, msg, command).await?;
         }
         Err(_) => {
+            // first check if the user entered a string starting with '/' but which is not a command
+            if msg.text().unwrap_or_default().starts_with('/') {
+                bot.send_message(msg.chat.id, "Invalid command! Please see `/help`").await?;
+                return Ok(());
+            }
             convert_expression_to_image(bot, msg).await?;
         }
     }
@@ -30,6 +36,16 @@ async fn message_handler(bot: Throttle<Bot>, msg: Message) -> ResponseResult<()>
 #[tokio::main]
 async fn main() {
     let bot = Bot::from_env();
+
+    // Define the list of commands
+    let commands = vec![
+        BotCommand::new("help", "display this text."),
+        BotCommand::new("syntax {expression}", "get LaTeX syntax of a given expression."),
+    ];
+
+    // Set the commands in the menu
+    bot.set_my_commands(commands).await.unwrap();
+
     let bot: Throttle<Bot> = bot.throttle(
         Limits { 
             messages_per_sec_chat: 1,
